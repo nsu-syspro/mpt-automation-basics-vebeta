@@ -23,6 +23,5 @@ clean:
 
 check: $(TARGET)
 	@for t in $(TESTS); do \
-		./$(TARGET) $$t | diff -u test/$$(basename $$t .txt).expected - || (echo "Test failed: $$t"; exit 1); \
+		./$(TARGET) $$t | diff -u test/$$(basename $$t .txt).expected - || exit 1; \
 	done
-	@:
