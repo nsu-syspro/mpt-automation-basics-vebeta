@@ -21,9 +21,9 @@ $(TARGET): $(SRC) config.json
 
 clean:
 	rm -rf $(BUILD)
+	rm -f test/*.check
 
 check: $(TARGET) $(TESTS_RUN)
-	@echo "All tests passed!"
 
 test/%.check: test/%.txt $(TARGET)
 	@./$(TARGET) $< | diff -u test/$*.expected - || (echo "Test failed: $<"; exit 1)
