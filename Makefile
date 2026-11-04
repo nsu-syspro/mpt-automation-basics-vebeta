@@ -9,9 +9,9 @@ CC      := gcc
 CFLAGS  := -Wall -Wextra -DNAME='"$(NAME)"' -DVERSION='"$(VERSION)"'
 
 TESTS_SRC := $(wildcard test/*.txt)
-TESTS_RUN := $(patsubst test/%.txt,test/%.check,$(TESTS_SRC))
+TESTS_RUN := $(patsubst test/%.txt,check_%,$(TESTS_SRC))
 
-.PHONY: all clean check
+.PHONY: all clean check $(TESTS_RUN)
 
 all: $(TARGET)
 
@@ -21,10 +21,8 @@ $(TARGET): $(SRC) config.json
 
 clean:
 	rm -rf $(BUILD)
-	rm -f test/*.check
 
 check: $(TARGET) $(TESTS_RUN)
 
-test/%.check: test/%.txt $(TARGET)
+check_%: test/%.txt $(TARGET)
 	@./$(TARGET) $< | diff -u test/$*.expected - || (echo "Test failed: $<"; exit 1)
-	@touch $@
