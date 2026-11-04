@@ -8,6 +8,9 @@ TARGET  := $(BUILD)/$(NAME)
 CC      := gcc
 CFLAGS  := -Wall -Wextra -DNAME='"$(NAME)"' -DVERSION='"$(VERSION)"'
 
+TESTS_SRC := $(wildcard test/*.txt)
+TESTS_RUN := $(patsubst test/%.txt,test/%.check,$(TESTS_SRC))
+
 .PHONY: all clean check
 
 all: $(TARGET)
@@ -19,17 +22,9 @@ $(TARGET): $(SRC) config.json
 clean:
 	rm -rf $(BUILD)
 
-TESTS := $(wildcard test/*.txt)
+check: $(TARGET) $(TESTS_RUN)
+	@echo "All tests passed!"
 
-check: $(TARGET)
-	@for t in $(TESTS); do \
-	    exp="$${t%.txt}.expected"; \
-	    out="$$(mktemp)"; \
-	    ./$(TARGET) "$$t" > "$$out"; \
-	    if ! diff -u "$$exp" "$$out"; then \
-	        echo "Test FAILED: $$t"; \
-	        rm -f "$$out"; \
-	        exit 1; \
-	    fi; \
-	    rm -f "$$out"; \
-	done
+test/%.check: test/%.txt $(TARGET)
+	@./$(TARGET) $< | diff -u test/$*.expected - || (echo "Test failed: $<"; exit 1)
+	@touch $@
