@@ -8,9 +8,10 @@ TARGET  := $(BUILD)/$(NAME)
 CC      := gcc
 CFLAGS  := -Wall -Wextra -DNAME='"$(NAME)"' -DVERSION='"$(VERSION)"'
 
-TESTS   := $(wildcard test/*.txt)
+TESTS      := $(wildcard test/*.txt)
+TEST_CASES := $(TESTS:%.txt=%.test)
 
-.PHONY: all clean check
+.PHONY: all clean check $(TEST_CASES)
 
 all: $(TARGET)
 
@@ -21,7 +22,7 @@ $(TARGET): $(SRC) config.json
 clean:
 	rm -rf $(BUILD)
 
-check: $(TARGET)
-	@for t in $(TESTS); do \
-		./$(TARGET) $$t | diff -u test/$$(basename $$t .txt).expected - || exit 1; \
-	done
+check: $(TARGET) $(TEST_CASES)
+
+test/%.test: test/%.txt test/%.expected $(TARGET)
+	@./$(TARGET) $< | diff -u test/$*.expected -
