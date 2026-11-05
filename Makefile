@@ -11,7 +11,7 @@ CFLAGS  := -Wall -Wextra -DNAME='"$(NAME)"' -DVERSION='"$(VERSION)"'
 TESTS      := $(wildcard test/*.txt)
 TEST_CASES := $(TESTS:%.txt=%.test)
 
-.PHONY: all clean check $(TEST_CASES)
+.PHONY: all clean check
 
 all: $(TARGET)
 
@@ -23,6 +23,7 @@ clean:
 	rm -rf $(BUILD)
 
 check: $(TARGET) $(TEST_CASES)
+	@:
 
 test/%.test: test/%.txt test/%.expected $(TARGET)
 	@./$(TARGET) $< | diff -u test/$*.expected -
